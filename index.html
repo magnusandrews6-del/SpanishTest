@@ -155,17 +155,34 @@ function speakSpanish(text){
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'es-ES';
 
-    // Try to pick a better local Spanish voice if available
-    const voices = window.speechSynthesis.getVoices();
-    const spanishVoice = voices.find(v => v.lang.startsWith('es') && v.localService === true);
+    // Get all available voices
+    let voices = window.speechSynthesis.getVoices();
+
+    // If voices are not yet loaded, wait a short time and try again
+    if(voices.length === 0){
+      window.speechSynthesis.onvoiceschanged = () => speakSpanish(text);
+      return;
+    }
+
+    // Try to pick a natural-sounding Spanish voice
+    // Prioritize iOS voices like "Monica", "Jorge" if available
+    let preferredVoices = ['Monica','Jorge','Diego','Maria'];
+    let spanishVoice = voices.find(v => preferredVoices.includes(v.name));
+    
+    // If no preferred voice, fallback to any Spanish voice
+    if(!spanishVoice){
+      spanishVoice = voices.find(v => v.lang.startsWith('es'));
+    }
+
     if(spanishVoice) utterance.voice = spanishVoice;
 
     window.speechSynthesis.speak(utterance);
   }
 }
 
-// Ensure voices are loaded on iOS
+// Ensure voices are loaded on iOS at page load
 window.addEventListener('load', () => { window.speechSynthesis.getVoices(); });
+
 
 // --- Session variables ---
 let currentQuestion = null;
@@ -237,3 +254,4 @@ newQuestion();
 
 </body>
 </html>
+
