@@ -11,8 +11,7 @@
     max-width: 600px;
     margin: auto;
     -webkit-text-size-adjust: 100%;
-    color: #FFFFFF; 
-    background-color: #151B45; 
+    background-color: #ffeb3b;
   }
 
   input {
@@ -44,7 +43,6 @@
 
 <script>
 // --- Data ---
-
 const verbs = [
   { infinitive: "hablar", type: "ar", english: "speak" },
   { infinitive: "comer", type: "er", english: "eat" },
@@ -102,68 +100,25 @@ const pronouns = [
   { spanish:"ellos", english:"They" }
 ];
 
-// --- English verb forms ---
-
+// --- English conjugations ---
 const englishTenses = {
-  hablar: {
-    present: ["speak","speak","speaks","speak","speak","speak"],
-    imperfect: ["was speaking","were speaking","was speaking","were speaking","were speaking","were speaking"],
-    preterite: ["spoke","spoke","spoke","spoke","spoke","spoke"]
-  },
-  comer: {
-    present: ["eat","eat","eats","eat","eat","eat"],
-    imperfect: ["was eating","were eating","was eating","were eating","were eating","were eating"],
-    preterite: ["ate","ate","ate","ate","ate","ate"]
-  },
-  vivir: {
-    present: ["live","live","lives","live","live","live"],
-    imperfect: ["was living","were living","was living","were living","were living","were living"],
-    preterite: ["lived","lived","lived","lived","lived","lived"]
-  },
-  ir: {
-    present: ["go","go","goes","go","go","go"],
-    imperfect: ["was going","were going","was going","were going","were going","were going"],
-    preterite: ["went","went","went","went","went","went"]
-  },
-  ser: {
-    present: ["am","are","is","are","are","are"],
-    imperfect: ["was","were","was","were","were","were"],
-    preterite: ["was","were","was","were","were","were"]
-  },
-  ver: {
-    present: ["see","see","sees","see","see","see"],
-    imperfect: ["was seeing","were seeing","was seeing","were seeing","were seeing","were seeing"],
-    preterite: ["saw","saw","saw","saw","saw","saw"]
-  },
-  tener: {
-    present: ["have","have","has","have","have","have"],
-    imperfect: ["had","had","had","had","had","had"],
-    preterite: ["had","had","had","had","had","had"]
-  },
-  hacer: {
-    present: ["do","do","does","do","do","do"],
-    imperfect: ["was doing","were doing","was doing","were doing","were doing","were doing"],
-    preterite: ["did","did","did","did","did","did"]
-  },
-  venir: {
-    present: ["come","come","comes","come","come","come"],
-    imperfect: ["was coming","were coming","was coming","were coming","were coming","were coming"],
-    preterite: ["came","came","came","came","came","came"]
-  },
-  decir: {
-    present: ["say","say","says","say","say","say"],
-    imperfect: ["was saying","were saying","was saying","were saying","were saying","were saying"],
-    preterite: ["said","said","said","said","said","said"]
-  }
+  hablar: { present:["speak","speak","speaks","speak","speak","speak"], imperfect:["was speaking","were speaking","was speaking","were speaking","were speaking","were speaking"], preterite:["spoke","spoke","spoke","spoke","spoke","spoke"] },
+  comer: { present:["eat","eat","eats","eat","eat","eat"], imperfect:["was eating","were eating","was eating","were eating","were eating","were eating"], preterite:["ate","ate","ate","ate","ate","ate"] },
+  vivir: { present:["live","live","lives","live","live","live"], imperfect:["was living","were living","was living","were living","were living","were living"], preterite:["lived","lived","lived","lived","lived","lived"] },
+  ir: { present:["go","go","goes","go","go","go"], imperfect:["was going","were going","was going","were going","were going","were going"], preterite:["went","went","went","went","went","went"] },
+  ser: { present:["am","are","is","are","are","are"], imperfect:["was","were","was","were","were","were"], preterite:["was","were","was","were","were","were"] },
+  ver: { present:["see","see","sees","see","see","see"], imperfect:["was seeing","were seeing","was seeing","were seeing","were seeing","were seeing"], preterite:["saw","saw","saw","saw","saw","saw"] },
+  tener: { present:["have","have","has","have","have","have"], imperfect:["had","had","had","had","had","had"], preterite:["had","had","had","had","had","had"] },
+  hacer: { present:["do","do","does","do","do","do"], imperfect:["was doing","were doing","was doing","were doing","were doing","were doing"], preterite:["did","did","did","did","did","did"] },
+  venir: { present:["come","come","comes","come","come","come"], imperfect:["was coming","were coming","was coming","were coming","were coming","were coming"], preterite:["came","came","came","came","came","came"] },
+  decir: { present:["say","say","says","say","say","say"], imperfect:["was saying","were saying","was saying","were saying","were saying","were saying"], preterite:["said","said","said","said","said","said"] }
 };
 
 // --- Utilities ---
-
 function randomItem(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function removeAccents(str){ return str.normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
 
-// --- Conjugation engine ---
-
+// --- Conjugation ---
 function conjugate(verb, tenseName, personIndex){
   const tense = tenses[tenseName];
   if(tense.irregulars[verb.infinitive]) return tense.irregulars[verb.infinitive][personIndex];
@@ -171,30 +126,37 @@ function conjugate(verb, tenseName, personIndex){
   return stem + tense.endings[verb.type][personIndex];
 }
 
-// --- Question generation ---
-
+// --- Session variables ---
 let currentQuestion = null;
+let sessionCorrect = 0;
+let sessionCount = 0;
+const sessionTotal = 20;
 
+// --- Generate question ---
 function newQuestion(){
+  if(sessionCount >= sessionTotal){
+    document.getElementById("prompt").innerText = "🎉 Session finished!";
+    document.getElementById("answer").style.display = "none";
+    document.querySelector("button").style.display = "none";
+    document.getElementById("feedback").innerText += ` Final score: ${sessionCorrect}/${sessionTotal}`;
+    return;
+  }
+
   const verb = randomItem(verbs);
   const tenseName = randomItem(Object.keys(tenses));
   const personIndex = Math.floor(Math.random()*pronouns.length);
   const pronoun = pronouns[personIndex];
 
-  // Use proper English conjugation
   const english = pronoun.english + " " + englishTenses[verb.infinitive][tenseName][personIndex];
-
   const correctAnswer = conjugate(verb, tenseName, personIndex);
 
   currentQuestion = { verb, tenseName, personIndex, correctAnswer };
-
   document.getElementById("prompt").innerText = english;
   document.getElementById("answer").value = "";
   document.getElementById("feedback").innerText = "";
 }
 
 // --- Check answer ---
-
 function checkAnswer(){
   const input = document.getElementById("answer").value.trim().toLowerCase();
   const tokens = input.split(/\s+/);
@@ -202,17 +164,19 @@ function checkAnswer(){
   const normalizedUserVerb = removeAccents(userVerb);
   const normalizedCorrect = removeAccents(currentQuestion.correctAnswer);
 
+  sessionCount++;
+
   if(normalizedUserVerb === normalizedCorrect){
-    document.getElementById("feedback").innerText = "✅ Correct!";
+    sessionCorrect++;
+    document.getElementById("feedback").innerText = `✅ Correct! (${sessionCorrect}/${sessionCount})`;
   } else {
-    document.getElementById("feedback").innerText = `❌ Incorrect. Correct: ${currentQuestion.correctAnswer}`;
+    document.getElementById("feedback").innerText = `❌ Incorrect. Correct: ${currentQuestion.correctAnswer} (${sessionCorrect}/${sessionCount})`;
   }
 
   setTimeout(newQuestion, 1500);
 }
 
 // --- Enter key support ---
-
 document.getElementById("answer").addEventListener("keydown", function(event){
   if(event.key === "Enter") checkAnswer();
 });
@@ -223,5 +187,4 @@ newQuestion();
 
 </body>
 </html>
-
 
