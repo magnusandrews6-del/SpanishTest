@@ -12,7 +12,7 @@
     margin: auto;
     -webkit-text-size-adjust: 100%;
     color: #FFFFFF; 
-    background-color: #151B45;
+    background-color: #151B45; 
   }
 
   input {
@@ -32,11 +32,17 @@
     margin-top: 10px;
     font-weight: bold;
   }
+
+  #score {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
 </style>
 </head>
 <body>
 
 <h1>Spanish Conjugation Trainer</h1>
+<p id="score">Score: 0/0</p>
 <p id="prompt"></p>
 <input id="answer" type="text" autocomplete="off">
 <button onclick="checkAnswer()">Submit</button>
@@ -101,7 +107,6 @@ const pronouns = [
   { spanish:"ellos", english:"They" }
 ];
 
-// --- English conjugations ---
 const englishTenses = {
   hablar: { present:["speak","speak","speaks","speak","speak","speak"], imperfect:["was speaking","were speaking","was speaking","were speaking","were speaking","were speaking"], preterite:["spoke","spoke","spoke","spoke","spoke","spoke"] },
   comer: { present:["eat","eat","eats","eat","eat","eat"], imperfect:["was eating","were eating","was eating","were eating","were eating","were eating"], preterite:["ate","ate","ate","ate","ate","ate"] },
@@ -133,6 +138,11 @@ let sessionCorrect = 0;
 let sessionCount = 0;
 const sessionTotal = 20;
 
+// --- Update score display ---
+function updateScore(){
+  document.getElementById("score").innerText = `Score: ${sessionCorrect}/${sessionCount}`;
+}
+
 // --- Generate question ---
 function newQuestion(){
   if(sessionCount >= sessionTotal){
@@ -155,6 +165,7 @@ function newQuestion(){
   document.getElementById("prompt").innerText = english;
   document.getElementById("answer").value = "";
   document.getElementById("feedback").innerText = "";
+  updateScore();
 }
 
 // --- Check answer ---
@@ -166,14 +177,13 @@ function checkAnswer(){
   const normalizedCorrect = removeAccents(currentQuestion.correctAnswer);
 
   sessionCount++;
-
   if(normalizedUserVerb === normalizedCorrect){
     sessionCorrect++;
-    document.getElementById("feedback").innerText = `✅ Correct! (${sessionCorrect}/${sessionCount})`;
+    document.getElementById("feedback").innerText = `✅ Correct!`;
   } else {
-    document.getElementById("feedback").innerText = `❌ Incorrect. Correct: ${currentQuestion.correctAnswer} (${sessionCorrect}/${sessionCount})`;
+    document.getElementById("feedback").innerText = `❌ Incorrect. Correct: ${currentQuestion.correctAnswer}`;
   }
-
+  updateScore();
   setTimeout(newQuestion, 1500);
 }
 
@@ -188,5 +198,3 @@ newQuestion();
 
 </body>
 </html>
-
-
