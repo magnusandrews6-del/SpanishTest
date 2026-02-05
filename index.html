@@ -1,14 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta charset="UTF-8">
 <title>Spanish Conjugation Trainer</title>
 <style>
-  body { font-family: Arial; padding: 10px; max-width: 600px; margin: auto; }
-  input { padding: 10px; font-size: 16px; width: 100%; box-sizing: border-box; }
-  button { padding: 10px 20px; font-size: 16px; margin-top: 10px; }
-  #feedback { margin-top: 10px; font-weight: bold; }
+  body {
+    font-family: Arial;
+    padding: 10px;
+    max-width: 600px;
+    margin: auto;
+    -webkit-text-size-adjust: 100%; /* Prevent Safari from resizing fonts */
+  }
+
+  input {
+    padding: 10px;
+    font-size: 18px; /* Bigger font prevents iOS zoom */
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 18px; /* Match input size */
+    margin-top: 10px;
+  }
+
+  #feedback {
+    margin-top: 10px;
+    font-weight: bold;
+  }
 </style>
+
 </head>
 <body>
 
@@ -151,3 +174,4 @@ newQuestion();
 
 </body>
 </html>
+
