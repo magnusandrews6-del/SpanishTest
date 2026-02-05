@@ -53,12 +53,13 @@
 </head>
 <body>
 
-<h1>Spanish Conjugations</h1>
+<h1>Spanish Conjugation Trainer</h1>
 <p id="prompt"></p>
 
 <div id="input-container">
   <input id="answer" type="text" autocomplete="off">
   <p id="score">Score: 0/0</p>
+  <button type="button" onclick="speakSpanish(currentQuestion.correctAnswer)">🔊 Listen</button>
 </div>
 
 <button onclick="checkAnswer()">Submit</button>
@@ -148,6 +149,15 @@ function conjugate(verb, tenseName, personIndex){
   return stem + tense.endings[verb.type][personIndex];
 }
 
+// --- Speech synthesis ---
+function speakSpanish(text){
+  if('speechSynthesis' in window){
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'es-ES';
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
 // --- Session variables ---
 let currentQuestion = null;
 let sessionCorrect = 0;
@@ -199,6 +209,10 @@ function checkAnswer(){
   } else {
     document.getElementById("feedback").innerText = `Incorrect. Correct: ${currentQuestion.correctAnswer}`;
   }
+
+  // Speak the correct Spanish answer
+  speakSpanish(currentQuestion.correctAnswer);
+
   updateScore();
   setTimeout(newQuestion, 1500);
 }
@@ -214,4 +228,3 @@ newQuestion();
 
 </body>
 </html>
-
