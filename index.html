@@ -10,20 +10,20 @@
     padding: 10px;
     max-width: 600px;
     margin: auto;
-    -webkit-text-size-adjust: 100%; /* Prevent Safari from resizing fonts */
-    background-color: #ffeb3b;
+    -webkit-text-size-adjust: 100%;
+    background-color: #ffeb3b; /* test color */
   }
 
   input {
     padding: 10px;
-    font-size: 18px; /* Bigger font prevents iOS zoom */
+    font-size: 18px;
     width: 100%;
     box-sizing: border-box;
   }
 
   button {
     padding: 10px 20px;
-    font-size: 18px; /* Match input size */
+    font-size: 18px;
     margin-top: 10px;
   }
 
@@ -32,7 +32,6 @@
     font-weight: bold;
   }
 </style>
-
 </head>
 <body>
 
@@ -102,10 +101,59 @@ const pronouns = [
   { spanish:"ellos", english:"They" }
 ];
 
-const englishTemplates = {
-  present: "{english} {verb}",
-  imperfect: "{english} was {verb}-ing",
-  preterite: "{english} {verb}-ed"
+// --- English verb forms ---
+
+const englishTenses = {
+  hablar: {
+    present: ["speak","speak","speaks","speak","speak","speak"],
+    imperfect: ["was speaking","were speaking","was speaking","were speaking","were speaking","were speaking"],
+    preterite: ["spoke","spoke","spoke","spoke","spoke","spoke"]
+  },
+  comer: {
+    present: ["eat","eat","eats","eat","eat","eat"],
+    imperfect: ["was eating","were eating","was eating","were eating","were eating","were eating"],
+    preterite: ["ate","ate","ate","ate","ate","ate"]
+  },
+  vivir: {
+    present: ["live","live","lives","live","live","live"],
+    imperfect: ["was living","were living","was living","were living","were living","were living"],
+    preterite: ["lived","lived","lived","lived","lived","lived"]
+  },
+  ir: {
+    present: ["go","go","goes","go","go","go"],
+    imperfect: ["was going","were going","was going","were going","were going","were going"],
+    preterite: ["went","went","went","went","went","went"]
+  },
+  ser: {
+    present: ["am","are","is","are","are","are"],
+    imperfect: ["was","were","was","were","were","were"],
+    preterite: ["was","were","was","were","were","were"]
+  },
+  ver: {
+    present: ["see","see","sees","see","see","see"],
+    imperfect: ["was seeing","were seeing","was seeing","were seeing","were seeing","were seeing"],
+    preterite: ["saw","saw","saw","saw","saw","saw"]
+  },
+  tener: {
+    present: ["have","have","has","have","have","have"],
+    imperfect: ["had","had","had","had","had","had"],
+    preterite: ["had","had","had","had","had","had"]
+  },
+  hacer: {
+    present: ["do","do","does","do","do","do"],
+    imperfect: ["was doing","were doing","was doing","were doing","were doing","were doing"],
+    preterite: ["did","did","did","did","did","did"]
+  },
+  venir: {
+    present: ["come","come","comes","come","come","come"],
+    imperfect: ["was coming","were coming","was coming","were coming","were coming","were coming"],
+    preterite: ["came","came","came","came","came","came"]
+  },
+  decir: {
+    present: ["say","say","says","say","say","say"],
+    imperfect: ["was saying","were saying","was saying","were saying","were saying","were saying"],
+    preterite: ["said","said","said","said","said","said"]
+  }
 };
 
 // --- Utilities ---
@@ -132,9 +180,8 @@ function newQuestion(){
   const personIndex = Math.floor(Math.random()*pronouns.length);
   const pronoun = pronouns[personIndex];
 
-  const english = englishTemplates[tenseName]
-    .replace("{english}", pronoun.english)
-    .replace("{verb}", verb.english);
+  // Use proper English conjugation
+  const english = pronoun.english + " " + englishTenses[verb.infinitive][tenseName][personIndex];
 
   const correctAnswer = conjugate(verb, tenseName, personIndex);
 
@@ -175,5 +222,4 @@ newQuestion();
 
 </body>
 </html>
-
 
