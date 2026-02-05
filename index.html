@@ -53,7 +53,7 @@
 </head>
 <body>
 
-<h1>Spanish Conjugation Trainer</h1>
+<h1>Spanish Conjugations</h1>
 <p id="prompt"></p>
 
 <div id="input-container">
@@ -162,7 +162,7 @@ function updateScore(){
 // --- Generate question ---
 function newQuestion(){
   if(sessionCount >= sessionTotal){
-    document.getElementById("prompt").innerText = "🎉 Session finished!";
+    document.getElementById("prompt").innerText = "Session finished";
     document.getElementById("answer").style.display = "none";
     document.querySelector("button").style.display = "none";
     document.getElementById("feedback").innerText += ` Final score: ${sessionCorrect}/${sessionTotal}`;
@@ -195,9 +195,9 @@ function checkAnswer(){
   sessionCount++;
   if(normalizedUserVerb === normalizedCorrect){
     sessionCorrect++;
-    document.getElementById("feedback").innerText = `✅ Correct!`;
+    document.getElementById("feedback").innerText = `Correct!`;
   } else {
-    document.getElementById("feedback").innerText = `❌ Incorrect. Correct: ${currentQuestion.correctAnswer}`;
+    document.getElementById("feedback").innerText = `Incorrect. Correct: ${currentQuestion.correctAnswer}`;
   }
   updateScore();
   setTimeout(newQuestion, 1500);
@@ -214,3 +214,4 @@ newQuestion();
 
 </body>
 </html>
+
