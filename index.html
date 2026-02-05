@@ -21,7 +21,7 @@
 
   #input-container {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 10px;
     margin-top: 10px;
   }
@@ -29,7 +29,7 @@
   input {
     padding: 10px;
     font-size: 18px;
-    flex: 1;
+    width: 100%;
     box-sizing: border-box;
   }
 
@@ -59,9 +59,9 @@
 <div id="input-container">
   <input id="answer" type="text" autocomplete="off">
   <p id="score">Score: 0/0</p>
-  <button type="button" onclick="speakSpanish(currentQuestion.correctAnswer)">🔊 Listen</button>
 </div>
 
+<button type="button" onclick="speakSpanish(currentQuestion.correctAnswer)">🔊 Listen</button>
 <button onclick="checkAnswer()">Submit</button>
 <p id="feedback"></p>
 
@@ -154,9 +154,18 @@ function speakSpanish(text){
   if('speechSynthesis' in window){
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'es-ES';
+
+    // Try to pick a better local Spanish voice if available
+    const voices = window.speechSynthesis.getVoices();
+    const spanishVoice = voices.find(v => v.lang.startsWith('es') && v.localService === true);
+    if(spanishVoice) utterance.voice = spanishVoice;
+
     window.speechSynthesis.speak(utterance);
   }
 }
+
+// Ensure voices are loaded on iOS
+window.addEventListener('load', () => { window.speechSynthesis.getVoices(); });
 
 // --- Session variables ---
 let currentQuestion = null;
@@ -174,7 +183,7 @@ function newQuestion(){
   if(sessionCount >= sessionTotal){
     document.getElementById("prompt").innerText = "Session finished";
     document.getElementById("answer").style.display = "none";
-    document.querySelector("button").style.display = "none";
+    document.querySelectorAll("button").forEach(b => b.style.display = "none");
     document.getElementById("feedback").innerText += ` Final score: ${sessionCorrect}/${sessionTotal}`;
     return;
   }
