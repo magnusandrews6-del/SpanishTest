@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Spanish Conjugation Trainer</title>
+<style>
+  body { font-family: Arial; padding: 10px; max-width: 600px; margin: auto; }
+  input { padding: 10px; font-size: 16px; width: 100%; box-sizing: border-box; }
+  button { padding: 10px 20px; font-size: 16px; margin-top: 10px; }
+  #feedback { margin-top: 10px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>Spanish Conjugation Trainer</h1>
+<p id="prompt"></p>
+<input id="answer" type="text" autocomplete="off">
+<button onclick="checkAnswer()">Submit</button>
+<p id="feedback"></p>
+
+<script>
+// --- Data ---
+
+const verbs = [
+  { infinitive: "hablar", type: "ar", english: "speak" },
+  { infinitive: "comer", type: "er", english: "eat" },
+  { infinitive: "vivir", type: "ir", english: "live" },
+  { infinitive: "ir", type: "ir", english: "go" },
+  { infinitive: "ser", type: "ir", english: "be" },
+  { infinitive: "ver", type: "er", english: "see" },
+  { infinitive: "tener", type: "er", english: "have" },
+  { infinitive: "hacer", type: "er", english: "do/make" },
+  { infinitive: "venir", type: "ir", english: "come" },
+  { infinitive: "decir", type: "ir", english: "say/tell" }
+];
+
+const tenses = {
+  present: {
+    endings: { ar:["o","as","a","amos","áis","an"], er:["o","es","e","emos","éis","en"], ir:["o","es","e","imos","ís","en"] },
+    irregulars: {
+      ir:["voy","vas","va","vamos","vais","van"],
+      ser:["soy","eres","es","somos","sois","son"],
+      ver:["veo","ves","ve","vemos","veis","ven"],
+      tener:["tengo","tienes","tiene","tenemos","tenéis","tienen"],
+      hacer:["hago","haces","hace","hacemos","hacéis","hacen"],
+      venir:["vengo","vienes","viene","venimos","venís","vienen"],
+      decir:["digo","dices","dice","decimos","decís","dicen"]
+    }
+  },
+  imperfect: {
+    endings: { ar:["aba","abas","aba","ábamos","abais","aban"], er:["ía","ías","ía","íamos","íais","ían"], ir:["ía","ías","ía","íamos","íais","ían"] },
+    irregulars: {
+      ir:["iba","ibas","iba","íbamos","ibais","iban"],
+      ser:["era","eras","era","éramos","erais","eran"],
+      ver:["veía","veías","veía","veíamos","veíais","veían"]
+    }
+  },
+  preterite: {
+    endings: { ar:["é","aste","ó","amos","asteis","aron"], er:["í","iste","ió","imos","isteis","ieron"], ir:["í","iste","ió","imos","isteis","ieron"] },
+    irregulars: {
+      ir:["fui","fuiste","fue","fuimos","fuisteis","fueron"],
+      ser:["fui","fuiste","fue","fuimos","fuisteis","fueron"],
+      ver:["vi","viste","vio","vimos","visteis","vieron"],
+      tener:["tuve","tuviste","tuvo","tuvimos","tuvisteis","tuvieron"],
+      hacer:["hice","hiciste","hizo","hicimos","hicisteis","hicieron"],
+      venir:["vine","viniste","vino","vinimos","vinisteis","vinieron"],
+      decir:["dije","dijiste","dijo","dijimos","dijisteis","dijeron"]
+    }
+  }
+};
+
+const pronouns = [
+  { spanish:"yo", english:"I" },
+  { spanish:"tú", english:"You (sing.)" },
+  { spanish:"él/ella", english:"He/She" },
+  { spanish:"nosotros", english:"We" },
+  { spanish:"vosotros", english:"You (pl.)" },
+  { spanish:"ellos", english:"They" }
+];
+
+const englishTemplates = {
+  present: "{english} {verb}",
+  imperfect: "{english} was {verb}-ing",
+  preterite: "{english} {verb}-ed"
+};
+
+// --- Utilities ---
+
+function randomItem(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function removeAccents(str){ return str.normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+
+// --- Conjugation engine ---
+
+function conjugate(verb, tenseName, personIndex){
+  const tense = tenses[tenseName];
+  if(tense.irregulars[verb.infinitive]) return tense.irregulars[verb.infinitive][personIndex];
+  const stem = verb.infinitive.slice(0,-2);
+  return stem + tense.endings[verb.type][personIndex];
+}
+
+// --- Question generation ---
+
+let currentQuestion = null;
+
+function newQuestion(){
+  const verb = randomItem(verbs);
+  const tenseName = randomItem(Object.keys(tenses));
+  const personIndex = Math.floor(Math.random()*pronouns.length);
+  const pronoun = pronouns[personIndex];
+
+  const english = englishTemplates[tenseName]
+    .replace("{english}", pronoun.english)
+    .replace("{verb}", verb.english);
+
+  const correctAnswer = conjugate(verb, tenseName, personIndex);
+
+  currentQuestion = { verb, tenseName, personIndex, correctAnswer };
+
+  document.getElementById("prompt").innerText = english;
+  document.getElementById("answer").value = "";
+  document.getElementById("feedback").innerText = "";
+}
+
+// --- Check answer ---
+
+function checkAnswer(){
+  const input = document.getElementById("answer").value.trim().toLowerCase();
+  const tokens = input.split(/\s+/);
+  const userVerb = tokens[tokens.length-1];
+  const normalizedUserVerb = removeAccents(userVerb);
+  const normalizedCorrect = removeAccents(currentQuestion.correctAnswer);
+
+  if(normalizedUserVerb === normalizedCorrect){
+    document.getElementById("feedback").innerText = "✅ Correct!";
+  } else {
+    document.getElementById("feedback").innerText = `❌ Incorrect. Correct: ${currentQuestion.correctAnswer}`;
+  }
+
+  setTimeout(newQuestion, 1500);
+}
+
+// --- Enter key support ---
+
+document.getElementById("answer").addEventListener("keydown", function(event){
+  if(event.key === "Enter") checkAnswer();
+});
+
+// --- Start ---
+newQuestion();
+</script>
+
+</body>
+</html>
